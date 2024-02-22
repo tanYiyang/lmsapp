@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+{% if user.is_authenticated %}
+    <p>User is authenticated</p>
+{% else %}
+    <p>User is not authenticated</p>
+{% endif %}
+<script>
+        // Retrieve token from storage
+    var token = localStorage.getItem('token');
+
+    // Extract username from the URL
+    var urlParts = window.location.href.split('/');
+    var username = urlParts[urlParts.length - 1]; // Assumes username is the last part of the URL
+
+    // Construct the URL to fetch profile data
+    var profileUrl = '/profiles/' + username + '/';
+
+    // Make a request to fetch profile data
+    fetch(profileUrl, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to fetch profile data');
+        }
+    })
+    .then(profileData => {
+        // Handle profile data
+        console.log(profileData);
+        // Update HTML to display profile information
+        
+    })
+    .catch(error => {
+        // Handle error
+        console.error('Error fetching profile data:', error);
+        // Display error message to user
+        
+    });
+</script>
+{% endblock %}
