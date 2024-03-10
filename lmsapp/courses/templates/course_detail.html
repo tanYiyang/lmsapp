@@ -4,7 +4,8 @@
     <div id="course-details" class="max-w-lg mx-auto overflow-hidden">
         
     </div>
-    {% if not user.profile.is_teacher %}
+    
+    {% if not user.profile.is_teacher and user.is_authenticated %}
             <div class="flex justify-center mt-4">
                 <button id="enroll-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enroll</button>
             </div>
@@ -33,31 +34,33 @@
         })
         .catch(error => console.error('Error fetching course data:', error));
     
-    //handles the enrolment
     const enrollButton = document.getElementById('enroll-button');
-    enrollButton.addEventListener('click', () => {
-        fetch('/api/enroll/{{ course_id }}/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
+    //handles the enrolment
+    if (enrollButton) {
+        enrollButton.addEventListener('click', () => {
+            fetch('/api/enroll/{{ course_id }}/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
 
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                enrollButton.style.display = 'none';
-            } else {
-                throw new Error('Failed to enroll in the course. Please try again later.');
-            }
-        })
-        .catch(error => {
-            console.error('Error enrolling in the course:', error);
-            alert(error.message || 'An error occurred while enrolling in the course. Please try again later.');
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    enrollButton.style.display = 'none';
+                } else {
+                    throw new Error('Failed to enroll in the course. Please try again later.');
+                }
+            })
+            .catch(error => {
+                console.error('Error enrolling in the course:', error);
+                alert(error.message || 'An error occurred while enrolling in the course. Please try again later.');
+            });
         });
-    });
+    };
 
     //retrieves the course's feedback
     fetch('/api/feedback/{{ course_id }}/')

@@ -16,8 +16,6 @@
 <nav
   class="relative flex w-full flex-wrap items-center justify-between bg-neutral-100 shadow-lg hover:text-neutral-700 py-4">
   <div class="flex w-full flex-wrap items-center justify-between px-8">
-
-    <!--Icon-->
     <div>
       <a class="flex items-center justify-between" href="#">
         <span class="material-symbols-outlined text-5xl">
@@ -27,8 +25,6 @@
       </a>
     </div>
     {% if user.is_authenticated %}
-    <!-- User menu -->
-
     <div class="flex items-center order-2 relative">
       <button type="button" class="flex text-sm" id="notification-button" aria-expanded="false">
         <span class="material-symbols-outlined pr-5">notifications</span>
@@ -132,30 +128,28 @@
           }
       });
 
-      // Establish WebSocket connection for notifications
       const socket = new WebSocket('ws://localhost:8080/ws/notifications/');
 
       socket.onopen = function(event) {
           console.log('WebSocket connection established for notifications.');
       };
 
-      // Update the WebSocket event handler to show the popup notification
       socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         const message = data.message
         const notificationDiv = document.getElementById('notification-menu');
         notificationDiv.innerHTML += '<div class="px-4 py-2 text-sm text-gray-800 hover:bg-gray-200">' + message + '</div>';
 
-        // Show the popup notification with the received message
+        //popup notification
         const popupNotification = document.getElementById('popup-notification');
         const popupMessage = document.getElementById('popup-message');
         popupMessage.textContent = message;
         popupNotification.classList.remove('hidden');
 
-        // Set a timeout to hide the popup notification after a few seconds
+        //timeout
         setTimeout(function() {
           popupNotification.classList.add('hidden');
-        }, 10000); // Adjust the timeout duration as needed (in milliseconds)
+        }, 5000); // Adjust the timeout duration as needed (in milliseconds)
       };
 
       socket.onerror = function(error) {

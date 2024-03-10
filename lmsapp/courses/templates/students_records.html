@@ -40,12 +40,12 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF token is included
+                    'X-CSRFToken': '{{ csrf_token }}' 
                 }
             })
             .then(response => {
                 if (response.ok) {
-                    // Reload the page after successful removal
+                    
                     window.location.reload();
                 } else {
                     throw new Error('Failed to remove student from the course');

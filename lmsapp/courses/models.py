@@ -17,6 +17,9 @@ class Feedback(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.content
+    
 class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -36,6 +39,9 @@ class Submission(models.Model):
     submitted_file = models.FileField(upload_to='submissions')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Submission by {self.student.username} for {self.post.title} submitted at {self.submitted_at}"
+    
 class Notification(models.Model):
     NOTIFICATION_TYPES = (
         ('Post', 'Post'),  
@@ -49,7 +55,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.user.username} - {self.notification_type}'
+        return f'{self.user.username} created a notification {self.message} of {self.notification_type} type'
 
     class Meta:
         ordering = ['-created_at']

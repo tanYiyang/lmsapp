@@ -15,9 +15,9 @@ import os
 from django.core.management.commands.runserver import Command as runserver
 #sets default port to 8080 so daphne can run
 runserver.default_port = "8080"
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+LOGIN_URL = '/login/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

@@ -19,14 +19,14 @@
     <div class="grid grid-cols-2 gap-8 mt-8">
         <div class="pt-8">
             <div class="uppercase tracking-wide text-sm font-semibold">
-                {% if user.profile.is_teacher %}
+                {% if profile.is_teacher %}
                 Courses taught:
                 {% else %}
                 Courses enrolled in:
                 {% endif %}
             </div>
             <ul>
-                {% if user.profile.is_teacher %}
+                
                 {% for course in courses_taught %}
                 <div class="flex">
                     <li>{{ course.title }}</li>
@@ -39,13 +39,14 @@
                     {% endif %}
                 </div>
                 {% endfor %}
-                {% else %}
+
+                
                 {% for course in courses_enrolled %}
                 <a href="{% url 'course_home' course.id %}">
                     <li class="text-blue-700 hover:underline py-5">{{ course.title }}</li>
                 </a>
                 {% endfor %}
-                {% endif %}
+                
             </ul>
         </div>
         {% if not profile.is_teacher %}
