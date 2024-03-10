@@ -128,7 +128,7 @@
           }
       });
 
-      var socketUrl = 'ws://' + window.location.host + '/ws/chat/' + selectedRoom + '/';
+      var socketUrl = 'wss://' + window.location.host + '/ws/notifications/';
       socket = new WebSocket(socketUrl);
 
       socket.onopen = function(event) {
