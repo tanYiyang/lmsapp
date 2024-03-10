@@ -89,7 +89,7 @@
         //handles changing of rooms
         roomSelect.addEventListener('change', function () {
             chatMessages.innerHTML = '';
-            closeWebSocket
+            closeWebSocket();
             establishWebSocket();
             
             
