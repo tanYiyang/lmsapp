@@ -58,7 +58,7 @@
         //handles all websocket logic
         function establishWebSocket() {
             var selectedRoom = roomSelect.value;
-            var socketUrl = 'ws://' + window.location.host + '/ws/chat/' + selectedRoom + '/';
+            var socketUrl = 'wss://' + window.location.host + '/ws/chat/' + selectedRoom + '/';
             socket = new WebSocket(socketUrl);
         
             //handles incoming message
