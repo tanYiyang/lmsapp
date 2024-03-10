@@ -1,111 +1,172 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-    <title>Ease Learn</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-		{% tailwind_css %}
-	</head>
 
-    <nav class="relative flex w-full flex-wrap items-center justify-between bg-neutral-100 shadow-lg hover:text-neutral-700 py-4">
-    <div class="flex w-full flex-wrap items-center justify-between px-8">
+<head>
+  <title>Ease Learn</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-      <!--Icon-->
-      <div>
-        <a class="flex items-center justify-between" href="#">
-          <span class="material-symbols-outlined text-5xl">
-            school
-            </span>
-            <span class="self-center text-2xl font-semibold pl-2">Ease Learn</span>
-        </a>
+  {% tailwind_css %}
+</head>
+
+<nav
+  class="relative flex w-full flex-wrap items-center justify-between bg-neutral-100 shadow-lg hover:text-neutral-700 py-4">
+  <div class="flex w-full flex-wrap items-center justify-between px-8">
+
+    <!--Icon-->
+    <div>
+      <a class="flex items-center justify-between" href="#">
+        <span class="material-symbols-outlined text-5xl">
+          school
+        </span>
+        <span class="self-center text-2xl font-semibold pl-2">Ease Learn</span>
+      </a>
+    </div>
+    {% if user.is_authenticated %}
+    <!-- User menu -->
+
+    <div class="flex items-center order-2 relative">
+      <button type="button" class="flex text-sm" id="notification-button" aria-expanded="false">
+        <span class="material-symbols-outlined pr-5">notifications</span>
+        <span class="sr-only">Notification menu</span>
+      </button>
+      <div id="popup-notification" class="fixed top-0 right-44 m-4 bg-white shadow-md rounded-md p-4 hidden">
+        <p id="popup-message" class="text-sm text-black"></p>
       </div>
-      {% if user.is_authenticated %}
-      <!-- User menu -->
-      <div class="flex items-center order-2 relative">
-        <button type="button" class="flex text-sm focus:ring-4 focus:ring-gray-200" id="profile-button" aria-expanded="false">
-          <span class="sr-only">User menu</span>
-          <img class="w-9 h-9 rounded-full" src="https://flowbite.com/docs/images/logo.svg" alt="profile photo">
-          <span class="pl-2 py-2 text-sm text-gray-900">{{ user.username }}</span>
-        </button>
-        <div class="z-100 hidden my-2 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow absolute top-full right-1">
-          <ul class="py-2" aria-labelledby="profile-button">
-            <li>
-              <a href="#" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Profile Page</a>
-            </li>
-            <li>
-              <a href="#" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Update Profile</a>
-            </li>
-            <li>
-              <a href="#" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200 truncate">Settings</a>
-            </li>
-            <li>
-              <a href="#" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Log out</a>
-            </li>
-          </ul>
-        </div>
+      <div class="z-100 hidden my-2 text-base bg-white divide-y divide-gray-200 rounded-lg shadow absolute top-full right-0 w-64" id="notification-menu">
+        <!-- notifications-->
+      </div>
+      <button type="button" class="flex text-sm focus:ring-4 focus:ring-gray-200" id="profile-button"
+        aria-expanded="false">
+        <span class="sr-only">User menu</span>
+        <img class="w-9 h-9 rounded-full" src="{{ user.profile.profile_pic.url }}" alt="profile photo">
+        <span class="pl-2 py-2 text-sm text-gray-900">{{ user.username }}</span>
+      </button>
+      <div
+        class="z-100 hidden my-2 text-base list-none bg-white divide-y divide-gray-200 rounded-lg shadow absolute top-full right-1" id="profile-menu">
+        <ul class="py-2" aria-labelledby="profile-button">
+          <li>
+            <a href="{% url 'user_profile' user.username %}"
+              class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Profile Page</a>
+          </li>
+          <li>
+            <a href="{% url 'update_profile' %}" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Update
+              Profile</a>
+          </li>
+          <a href="{% url 'logout' %}" class="block px-5 py-3 text-sm text-gray-800 hover:bg-gray-200">Log out</a>
+          </li>
+        </ul>
+      </div>
     </div>
 
     {% else %}
     <div class="flex items-center order-2 relative">
-      <a href="{% url 'login_form' %}" class="text-blue-500 text-sm px-5 py-3">Login</a>
-      <a href="{% url 'signup_form' %}" class="text-white text-sm bg-blue-700 rounded-lg px-5 py-3 hover:bg-blue-800">Signup</a>
-      
+      <a href="{% url 'login' %}" class="text-blue-500 text-sm px-5 py-3">Login</a>
+      <a href="{% url 'signup' %}"
+        class="text-white text-sm bg-blue-700 rounded-lg px-5 py-3 hover:bg-blue-800">Signup</a>
+
     </div>
     {% endif %}
     <div class="items-center justify-between flex w-auto order-1">
       <ul class="flex font-medium space-x-9 flex-row md:border-0">
         <li>
-          <a href="#" class="block text-gray-800" aria-current="page">Home</a>
+          <a href="{% url 'course_list' %}" class="block text-gray-800 hover:text-blue-600">Courses</a>
         </li>
         <li>
-          <a href="#" class="block text-gray-800 hover:text-blue-600">Courses</a>
+          <a href="{% url 'chat' room_name='everyone'%}" class="block text-gray-800 hover:text-blue-600">Chat</a>
         </li>
         <li>
-          <a href="#" class="block text-gray-800 hover:text-blue-600">Chat</a>
-        </li>
-        <li>
-          <a href="#" class="block text-gray-800 hover:text-blue-600">Contact</a>
+          <a href="{% url 'social' %}" class="block text-gray-800 hover:text-blue-600">Social</a>
         </li>
       </ul>
     </div>
 
 
-    </div>
-  </nav>
-  
-	<body class="bg-gray-50 font-serif">
-		<div class="container mx-auto">
-			<section class="flex items-center justify-center h-screen">
-                {% block content %}
-                {% endblock %}
-			</section>
-		</div>
-	</body>
+  </div>
+</nav>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var profileButton = document.getElementById('profile-button');
-        var profile = document.querySelector('.hidden');
+<body class="bg-gray-50 font-serif">
+  <div class="">
+    <section class="">
+      {% block content %}
+      {% endblock %}
+    </section>
+  </div>
+</body>
 
-        profileButton.addEventListener('click', function() {
-            var expanded = profile.getAttribute('aria-expanded') === 'true' || false;
-            profile.setAttribute('aria-expanded', !expanded);
-            profile.classList.toggle('hidden');
-        });
-        /* click anywhere else to close menu */
-        document.addEventListener('click', function(event) {
-        const isClickInside = profile.contains(event.target) || profileButton.contains(event.target);
-        if (!isClickInside) {
-          profileButton.setAttribute('aria-expanded', 'false');
-          profile.classList.add('hidden');
-        }
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      var profileButton = document.getElementById('profile-button');
+      var profileMenu = document.getElementById('profile-menu');
+
+      profileButton.addEventListener('click', function () {
+          var expanded = profileMenu.getAttribute('aria-expanded') === 'true' || false;
+          profileMenu.setAttribute('aria-expanded', !expanded);
+          profileMenu.classList.toggle('hidden');
+      });
+
+      var notificationButton = document.getElementById('notification-button');
+      var notificationMenu = document.getElementById('notification-menu');
+
+      notificationButton.addEventListener('click', function () {
+          var expanded = notificationMenu.getAttribute('aria-expanded') === 'true' || false;
+          notificationMenu.setAttribute('aria-expanded', !expanded);
+          notificationMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', function (event) {
+          const isProfileClickInside = profileMenu.contains(event.target) || profileButton.contains(event.target);
+          if (!isProfileClickInside) {
+              profileMenu.setAttribute('aria-expanded', 'false');
+              profileMenu.classList.add('hidden');
+          }
+
+          const isNotificationClickInside = notificationMenu.contains(event.target) || notificationButton.contains(event.target);
+          if (!isNotificationClickInside) {
+              notificationMenu.setAttribute('aria-expanded', 'false');
+              notificationMenu.classList.add('hidden');
+          }
+      });
+
+      // Establish WebSocket connection for notifications
+      const socket = new WebSocket('ws://localhost:8080/ws/notifications/');
+
+      socket.onopen = function(event) {
+          console.log('WebSocket connection established for notifications.');
+      };
+
+      // Update the WebSocket event handler to show the popup notification
+      socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const message = data.message
+        const notificationDiv = document.getElementById('notification-menu');
+        notificationDiv.innerHTML += '<div class="px-4 py-2 text-sm text-gray-800 hover:bg-gray-200">' + message + '</div>';
+
+        // Show the popup notification with the received message
+        const popupNotification = document.getElementById('popup-notification');
+        const popupMessage = document.getElementById('popup-message');
+        popupMessage.textContent = message;
+        popupNotification.classList.remove('hidden');
+
+        // Set a timeout to hide the popup notification after a few seconds
+        setTimeout(function() {
+          popupNotification.classList.add('hidden');
+        }, 10000); // Adjust the timeout duration as needed (in milliseconds)
+      };
+
+      socket.onerror = function(error) {
+          console.error('WebSocket error:', error);
+      };
+
+      socket.onclose = function(event) {
+          console.log('WebSocket connection closed for notifications:', event.code, event.reason);
+      };
   });
-  });
 
+</script>
 
-
-  </script>
 </html>

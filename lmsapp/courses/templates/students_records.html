@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold text-gray-800 pb-6 flex justify-center">{{ course.title }} Records</h1>
+    <div class="overflow-x-auto">
+        <table class="mx-auto table-auto">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Name</th>
+                    <th class="px-4 py-2">Email</th>
+                    <th class="px-4 py-2">Address</th>
+                    <th class="px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in enrolled_students %}
+                    <tr>
+                        <td class="border px-4 py-2">{{ student.profile.first_name }} {{ student.profile.last_name }}</td>
+                        <td class="border px-4 py-2">{{ student.email }}</td>
+                        <td class="border px-4 py-2">{{ student.profile.address }}</td>
+                        <td class="border px-4 py-2">
+                            <form onsubmit="removeStudent('{{ course.id }}', '{{ student.id }}'); return false;">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function removeStudent(courseId, studentId) {
+        if (confirm("Are you sure you want to remove this student from the course?")) {
+            fetch(`/api/remove_student/${courseId}/${studentId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF token is included
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page after successful removal
+                    window.location.reload();
+                } else {
+                    throw new Error('Failed to remove student from the course');
+                }
+            })
+            .catch(error => console.error('Error removing student from course:', error));
+        }
+    }
+</script>
+{% endblock %}

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="w-1/2">
+<div class="w-1/2 mx-auto mt-40">
 
-        <form class="bg-white shadow-md rounded px-8 p-5" id="user_form" method="post" action="/api/signup/"
+        <form class="bg-white shadow-md rounded px-8 p-5" id="user_form" method="post" action="/signup/"
                 enctype="multipart/form-data">
             <h1 class="text-3xl font-bold text-gray-800 pb-6">Sign Up</h1>
             {% csrf_token %}

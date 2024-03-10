@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="w-1/2">
+<div class="w-1/2 mx-auto mt-40">
 
-        <form class="bg-white shadow-md rounded px-8 p-5" id="user_form" method="post" action="/api/login/"
+        <form class="bg-white shadow-md rounded px-8 p-5" id="user_form" method="post" action="/login/"
                 enctype="multipart/form-data">
             <h1 class="text-3xl font-bold text-gray-800 pb-6">Login</h1>
             {% csrf_token %}
@@ -31,60 +31,6 @@
         </form>
 
     </div>
-
-    <script>
-        document.getElementById('user_form').addEventListener('submit', function(event) {
-            event.preventDefault();
-    
-            var formData = new FormData(this);
-    
-            fetch('/api/login/', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.token && data.profile_url) {
-                    // Store token in local storage
-                    localStorage.setItem('token', data.token);
-                    
-                    // Add token to Authorization header
-                    var headers = new Headers();
-                    headers.append('Authorization', 'Token ' + data.token);
-    
-                    // Fetch profile_url with authorization header
-                    fetch(data.profile_url, {
-                        method: 'GET',
-                        headers: headers,
-                    })
-                    .then(profileResponse => {
-                        if (profileResponse.ok) {
-                            window.location.href = data.profile_url;
-                        } else {
-                            throw new Error('Failed to fetch profile data');
-                        }
-                    })
-                    .catch(profileError => {
-                        console.error('Profile request failed:', profileError);
-                    });
-                } else {
-                    var errorMessageElement = document.getElementById('error_message');
-                    if (errorMessageElement) {
-                        errorMessageElement.style.display = 'block';
-                        errorMessageElement.innerHTML = '<p class="text-red-700">' + (data.error || 'An error occurred.') + '</p>';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Login request failed:', error);
-                var errorMessageElement = document.getElementById('error_message');
-                if (errorMessageElement) {
-                    errorMessageElement.style.display = 'block';
-                    errorMessageElement.innerHTML = '<p class="text-red-700">An error occurred. Please try again.</p>';
-                }
-            });
-        });
-    </script>
 {% endblock %}
 
  

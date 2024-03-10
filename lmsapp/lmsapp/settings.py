@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.management.commands.runserver import Command as runserver
+#sets default port to 8080 so daphne can run
+runserver.default_port = "8080"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,7 +46,11 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     "accounts",
+    "courses",
     "django_browser_reload",
+    'channels',
+    'chat',
+    
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -82,7 +90,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "lmsapp.wsgi.application"
+#WSGI_APPLICATION = "lmsapp.wsgi.application"
+ASGI_APPLICATION = 'lmsapp.asgi.application'
 
 
 # Database
@@ -129,6 +138,8 @@ USE_TZ = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+LOGIN_REDIRECT_URL = '/'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -136,6 +147,13 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

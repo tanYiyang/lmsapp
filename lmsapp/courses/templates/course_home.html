@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold text-gray-800 pb-6 flex justify-center">{{ course.title }}</h1>
+    <div class="flex justify-between">
+        <div class="w-1/3 bg-white overflow-y-auto border border-gray-300 rounded-lg shadow-md p-4 mr-4">
+            <h2 class="text-xl font-bold mb-4">Course Material</h2>
+            <ul>
+            
+                {% for post in posts %}
+                    <li class="text-blue-500 cursor-pointer hover:text-blue-700 mb-2" data-post-id="{{ post.id }}">{{ post.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="w-2/3 bg-white overflow-y-auto border border-gray-300 rounded-lg shadow-md p-4">
+            <h2 class="text-xl font-bold mb-4">Content</h2>
+            <div id="post-content-container">
+                {% for post in posts %}
+                    <div id="post-content-{{ post.id }}" class="post-content hidden">
+                        <h3>{{ post.title }}</h3>
+                        <p>{{ post.content }}</p>
+                        {% if post.file %}
+                            <a href="{{ post.file.url }}" target="_blank" class="text-blue-500 hover:text-blue-700">Download File</a>
+                        {% endif %}
+                        {% if post.deadline %}
+                        <!-- assignment submission -->
+                        <div class="mt-8">
+                            <form id="assignment-form" action="{% url 'submit_assignment_api' post.id %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <label for="assignment">Assignment Submission:</label><br>
+                                {% if not post.has_submission %}
+                                <input type="file" id="assignment" name="submitted_file"><br>
+                                <input type="hidden" id="student" name="student" value="{{ request.user.id }}">
+                                <input type="hidden" id="post" name="post" value="{{ post.id }}">
+                                <p class="text-red-600">Due on {{post.deadline}}</p>
+                                
+                                <button class="text-blue-500 text-sm" type="submit">Submit Assignment</button>
+                                {% else %}
+                                <div class="mt-8">
+                                    <p class="text-green-600">Assignment submitted.</p>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+        <!-- feedback form -->
+        <div class="mt-8">
+            <form id="feedback-form" action="{% url 'feedback_submit' %}" method="post">
+                {% csrf_token %}
+                <label for="feedback">Feedback:</label><br>
+                <textarea id="content" name="content" rows="4" cols="50"></textarea><br>
+                <input type="hidden" id="student" name="student" value="{{ request.user.id }}">
+                <input type="hidden" id="course" name="course" value="{{ course.id }}">
+                <button class="text-blue-500 text-sm" type="submit">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    //toggling between the posts
+    document.addEventListener('DOMContentLoaded', function() {
+        const postItems = document.querySelectorAll('[data-post-id]');
+        const postContentContainer = document.getElementById('post-content-container');
+
+        postItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                const postId = item.getAttribute('data-post-id');
+                const postContent = document.getElementById('post-content-' + postId);
+
+                postContentContainer.querySelectorAll('.post-content').forEach(function(content) {
+                    content.classList.add('hidden');
+                });
+
+                if (postContent) {
+                    postContent.classList.remove('hidden');
+                }
+            });
+        });
+    });
+
+    //handling submission of feedback form
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackForm = document.getElementById('feedback-form');
+
+        feedbackForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const formData = new FormData(feedbackForm);
+
+            fetch(feedbackForm.getAttribute('action'), {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' 
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Feedback submitted successfully!');
+                    feedbackForm.reset(); 
+                } else {
+                    throw new Error('Failed to submit feedback. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting feedback:', error);
+                alert('An error occurred while submitting feedback. Please try again later.');
+            });
+        });
+    });
+
+    //handling submission of assignment
+    document.addEventListener('DOMContentLoaded', function() {
+    const assignmentForm = document.getElementById('assignment-form');
+
+    assignmentForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(assignmentForm);
+
+        fetch(assignmentForm.getAttribute('action'), {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Assignment submitted successfully!');
+                assignmentForm.reset();
+            } else {
+                throw new Error('Failed to submit assignment. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting assignment:', error);
+            alert('An error occurred while submitting assignment. Please try again later.');
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,47 +1,148 @@
 {% extends "base.html" %}
 {% block content %}
 {% if user.is_authenticated %}
-    <p>User is authenticated</p>
-{% else %}
-    <p>User is not authenticated</p>
+<div class="w-3/4 mx-auto mt-40">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <img class="w-48 h-48" src="{{ user.profile.profile_pic.url }}" alt="User Profile Picture">
+        </div>
+        <div class="p-8">
+            <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">{{ profile.first_name }}</div>
+            <div id="status-container" class="mt-2">
+                <span class="pr-10" id="status-text">{{ profile.status }}</span> 
+                {% if user.is_authenticated and user == profile.user %}
+                <button id="edit-status-btn" class="ml-2 text-blue-500 hover:text-blue-700">Edit Status</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-8 mt-8">
+        <div class="pt-8">
+            <div class="uppercase tracking-wide text-sm font-semibold">
+                {% if user.profile.is_teacher %}
+                Courses taught:
+                {% else %}
+                Courses enrolled in:
+                {% endif %}
+            </div>
+            <ul>
+                {% if user.profile.is_teacher %}
+                {% for course in courses_taught %}
+                <div class="flex">
+                    <li>{{ course.title }}</li>
+                    {% if user == course.teacher.user %}
+                    <div class="pl-52">
+                        <a href="{% url 'edit_course' course.id %}" class="text-blue-500 hover:text-blue-700">Edit</a>
+                        <a href="{% url 'add_post' course.id %}" class="text-blue-500 hover:text-blue-700 pl-5">Add Post</a>
+                        <a href="{% url 'students_records' course.id %}" class="text-blue-500 hover:text-blue-700 pl-5">Students</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                {% for course in courses_enrolled %}
+                <a href="{% url 'course_home' course.id %}">
+                    <li class="text-blue-700 hover:underline py-5">{{ course.title }}</li>
+                </a>
+                {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+        {% if not profile.is_teacher %}
+        <div class="pt-8">
+            <div class="uppercase tracking-wide text-sm font-semibold">Upcoming Deadline:</div>
+            <div id="deadlines-container">
+                <!-- deadlines belong here -->
+            </div>
+        </div>
+        {% endif%}
+    </div>
+</div>
 {% endif %}
 <script>
-        // Retrieve token from storage
-    var token = localStorage.getItem('token');
+    //fetches students' deadlines
+    document.addEventListener('DOMContentLoaded', function () {
+        //gets the username from the url
+        const currentUrl = window.location.href;
+        const urlParts = currentUrl.split('/');
+        const usernameIndex = urlParts.indexOf('profiles') + 1;
+        const username = urlParts[usernameIndex];
 
-    // Extract username from the URL
-    var urlParts = window.location.href.split('/');
-    var username = urlParts[urlParts.length - 1]; // Assumes username is the last part of the URL
+        //retrieving from API
+        fetch(`/api/deadlines/${username}/`)
+            .then(response => response.json())
+            .then(data => {
+                const deadlinesContainer = document.getElementById('deadlines-container');
 
-    // Construct the URL to fetch profile data
-    var profileUrl = '/profiles/' + username + '/';
-
-    // Make a request to fetch profile data
-    fetch(profileUrl, {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Token ' + token,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Failed to fetch profile data');
-        }
-    })
-    .then(profileData => {
-        // Handle profile data
-        console.log(profileData);
-        // Update HTML to display profile information
-        
-    })
-    .catch(error => {
-        // Handle error
-        console.error('Error fetching profile data:', error);
-        // Display error message to user
-        
+                data.forEach(deadline => {
+                    const deadlineItem = document.createElement('div');
+                    deadlineItem.innerHTML = `${deadline.course_title} | ${deadline.title} | <strong class="text-bold">Due: ${deadline.deadline}</strong>`;
+                    if (deadline.has_submission) {
+                        deadlineItem.innerHTML += ' <span class="text-green-500">Submitted</span>';
+                    }
+                    deadlinesContainer.appendChild(deadlineItem);
+                });
+            })
+            .catch(error => console.error('Error fetching deadlines:', error));
     });
+
+    //handles the toggling of the status element between editing and normal display
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusContainer = document.getElementById('status-container');
+        const statusText = document.getElementById('status-text');
+        const editStatusBtn = document.getElementById('edit-status-btn');
+
+        function toggleStatusEdit() {
+            const user_status = statusText.textContent.trim();
+            //initial display of status and the edit status button
+            if (statusContainer.contains(statusText)) {
+                const statusInput = document.createElement('input');
+                statusInput.type = 'text';
+                statusInput.value = user_status;
+                statusInput.id = 'status-input';
+                statusInput.classList.add('border', 'border-gray-300', 'p-1', 'rounded', 'focus:outline-none', 'focus:border-blue-500');
+                statusContainer.appendChild(statusInput);
+                statusContainer.appendChild(editStatusBtn);
+                statusContainer.removeChild(statusText);
+                statusInput.focus(); 
+                editStatusBtn.textContent = 'Save'; 
+            } else {
+
+                const newStatus = statusContainer.querySelector('#status-input').value;
+                //retrieve profile status from API
+                fetch('/api/profile/status/', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}' 
+                    },
+                    body: JSON.stringify({ user_status: newStatus })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error('Failed to update status');
+                        }
+                    })
+                    .then(data => {
+                        statusText.textContent = data.status;
+                    })
+                    .catch(error => console.error('Error updating status:', error));
+
+                //changing back to normal display after saving
+                statusContainer.appendChild(statusText);
+                statusContainer.appendChild(editStatusBtn);
+                statusContainer.removeChild(statusContainer.querySelector('#status-input'));
+                editStatusBtn.textContent = 'Edit Status';
+            }
+        }
+
+        //checks if edit status button is clicked
+        editStatusBtn.addEventListener('click', function () {
+            toggleStatusEdit();
+        });
+    });
+
 </script>
 {% endblock %}

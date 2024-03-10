@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="w-1/2 mx-auto mt-20">
+    <h1 class="text-xl pb-5">Profile search</h1>
+    <form class="pb-5" id="search-form">
+        <input class="w-1/2" type="text" id="search-input" name="q" placeholder="Search users...">
+        <button type="submit" id="search-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Search
+        </button>
+    </form>
+    <ul id="search-results"></ul>
+    <ul id="last-name-list" class="list-disc pl-5">
+        {% for profile in profiles %}
+        <li class="py-1"><a href="{% url 'user_profile' profile.user %}">{{ profile.last_name }}</a></li>
+        {% endfor %}
+    </ul>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const lastNames = Array.from(document.querySelectorAll('#last-name-list li'));
+    
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = searchInput.value.trim().toLowerCase();
+    
+            lastNames.forEach(lastName => {
+                const textContent = lastName.textContent.toLowerCase();
+                if (textContent.includes(query)) {
+                    lastName.classList.remove('hidden');
+                } else {
+                    lastName.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

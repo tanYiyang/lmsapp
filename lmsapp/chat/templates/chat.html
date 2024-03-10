@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto mt-8">
+    <div class="bg-white rounded-lg shadow-lg p-4">
+        <div>
+            <label for="room-select" class="mr-2">Choose a room:</label>
+            <select id="room-select" class="border rounded-lg px-8 py-2 focus:outline-none">
+                <!-- room options go here -->
+            </select>
+        </div>
+        <div id="chat-messages" class="h-64 overflow-y-auto mb-4"></div>
+        <div class="flex items-center">
+            <input type="text" id="message-input" class="w-full border rounded-lg px-4 py-2 mr-2 focus:outline-none"
+                placeholder="Type your message...">
+            <button id="send-button"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none">Send</button>
+        </div>
+    </div>
+    <h2 class="text-xl pt-8">Connected users:</h2>
+    <div id="connected-users">
+
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var chatMessages = document.getElementById('chat-messages');
+        var messageInput = document.getElementById('message-input');
+        var sendButton = document.getElementById('send-button');
+        var roomSelect = document.getElementById('room-select');
+        var username = "{{ username }}";
+        var socket; //defined here so it does not throw an error when trying to close it
+
+        
+        //retrieve courses and populate room options
+        function populateRoomOptions() {
+            fetch('/api/courses/')
+                .then(response => response.json())
+                .then(data => {
+                    roomSelect.innerHTML = '';
+                    data.forEach(course => {
+                        var option = document.createElement('option');
+                        option.textContent = course.title;
+                        roomSelect.appendChild(option);
+                    });
+                    establishWebSocket();
+                })
+                .catch(error => console.error('Error fetching courses:', error));
+        }
+        populateRoomOptions();
+
+        //close websocket connection
+        function closeWebSocket() {
+            if (socket) {
+                socket.close();
+            }
+        }
+
+        //handles all websocket logic
+        function establishWebSocket() {
+            var selectedRoom = roomSelect.value;
+            socket = new WebSocket('ws://localhost:8080/ws/chat/' + selectedRoom + '/');
+        
+            //handles incoming message
+            socket.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+                var message = data.message;
+                var sender = data.username;
+                var messageElement = document.createElement('div');
+                messageElement.textContent = sender + ': ' + message;
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+
+            //handles outgoing message
+            sendButton.addEventListener('click', function () {
+            var message = messageInput.value;
+            var username = "{{ username }}";
+            if (message.trim() !== '') {
+                socket.send(JSON.stringify({
+                    'message': message,
+                    'username': username
+                }));
+                messageInput.value = '';
+            }
+            
+        });
+        };
+
+        //handles changing of rooms
+        roomSelect.addEventListener('change', function () {
+            chatMessages.innerHTML = '';
+            closeWebSocket
+            establishWebSocket();
+            
+            
+        });
+    });
+</script>
+{% endblock %}

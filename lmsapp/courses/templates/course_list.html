@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<!-- Icon from: https://www.flaticon.com/free-icon/add_14034643?term=green+plus&page=2&position=10&origin=search&related_id=14034643 -->
+<div class="container mx-auto mt-12">
+    <h1 class="text-3xl font-bold text-gray-800 pb-6 flex justify-center">Courses</h1>
+    {% if user.profile.is_teacher %}
+    <div class="flex justify-end items-center mb-4">
+        <a href="{% url 'create_course' %}" class="flex items-center text-black text-lg font-bold py-2 px-4">
+            <img class="w-10 h-10 mr-2" src="{% static 'courses/createbutton.png' %}" alt="createbutton">
+            Create Course</a>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-3 gap-4" id="course-cards">
+        
+    </div>
+</div>
+
+<script>
+    fetch('/api/courses/')
+        .then(response => response.json())
+        .then(data => {
+            const courseCards = document.getElementById('course-cards');
+            data.forEach(course => {
+                const card = document.createElement('div');
+                card.className = 'max-w-sm rounded overflow-hidden shadow-lg';
+                card.innerHTML = `
+                    <a href="/courses/${course.id}/">
+                    <div class="px-6 py-4">
+                        <div class="font-bold text-xl mb-2">${course.title}</div>
+                        <div>${course.description}</div>
+                        <p class="text-gray-700 text-base">
+                            Teacher: ${course.teacher.first_name} ${course.teacher.last_name}
+                        </p>
+                    </div>
+                    </a>
+                `;
+                courseCards.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Error fetching course data:', error));
+</script>
+{% endblock %}

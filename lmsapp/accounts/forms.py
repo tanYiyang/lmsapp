@@ -1,41 +1,18 @@
 from django import forms
-from django.forms import ModelForm
 from .models import *
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-
-class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    
+class ProfileUpdateForm(forms.ModelForm):
+    email = forms.EmailField(disabled=False)
 
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+        model = Profile
+        fields = ['first_name', 'last_name', 'address', 'email', 'profile_pic']
 
-class SignupForm(forms.Form):
-    username = forms.CharField(max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
-
-        #ensures passwords match
-        if password != confirm_password:
-            raise forms.ValidationError('Passwords do not match.')
-        return cleaned_data
-
-class Login(forms.Form):
-    username = forms.CharField(max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
-
-        #ensures passwords match
-        if password != confirm_password:
-            raise forms.ValidationError('Passwords do not match.')
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        user = kwargs['instance'].user
+        self.initial['email'] = user.email
+        self.fields['email'].widget.attrs['class'] = 'shadow appearence-none border rounded w-full py-2 px-4 focus:shadow-outline mb-4'
+        self.fields['first_name'].widget.attrs['class'] = 'shadow appearence-none border rounded w-full py-2 px-4 focus:shadow-outline mb-4'
+        self.fields['last_name'].widget.attrs['class'] = 'shadow appearence-none border rounded w-full py-2 px-4 focus:shadow-outline mb-4'
+        self.fields['address'].widget.attrs['class'] = 'shadow appearence-none border rounded w-full py-2 px-4 focus:shadow-outline mb-4'
