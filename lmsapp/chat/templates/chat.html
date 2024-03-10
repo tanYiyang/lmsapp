@@ -58,7 +58,8 @@
         //handles all websocket logic
         function establishWebSocket() {
             var selectedRoom = roomSelect.value;
-            socket = new WebSocket('ws://localhost:8080/ws/chat/' + selectedRoom + '/');
+            var socketUrl = 'ws://' + window.location.host + '/ws/chat/' + selectedRoom + '/';
+            socket = new WebSocket(socketUrl);
         
             //handles incoming message
             socket.onmessage = function (event) {
