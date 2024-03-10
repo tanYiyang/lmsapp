@@ -128,7 +128,8 @@
           }
       });
 
-      const socket = new WebSocket('ws://localhost:8080/ws/notifications/');
+      var socketUrl = 'ws://' + window.location.host + '/ws/chat/' + selectedRoom + '/';
+      socket = new WebSocket(socketUrl);
 
       socket.onopen = function(event) {
           console.log('WebSocket connection established for notifications.');
