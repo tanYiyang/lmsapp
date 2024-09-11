@@ -1,0 +1,2 @@
+CM3035 - Advanced Web Development
+A Learning Management System (LMS) built using Django for the frontend, Django Rest Framework (DRF) as the backend, and SQLite3 as the database. In addition to standard web application features like user authentication, the system includes an asynchronous real-time communication service. This service enables users to participate in live chatrooms through WebSockets, facilitating smooth and efficient collaboration and interaction within the platform.
